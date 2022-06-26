@@ -1,6 +1,11 @@
-# flutter_2d_game
+# dino_2d_game
 
-A new Flutter application.
+
+https://user-images.githubusercontent.com/72261684/175817977-d4235b98-cab4-4761-9fd4-a83c70f8bab6.mov
+
+
+
+
 
 ## Getting Started
 
