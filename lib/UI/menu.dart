@@ -53,8 +53,19 @@ class _MyMenuPageState extends State<MyMenuPage> {
                 );
               },
               child: Container(
-                color: Colors.transparent,
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.yellowAccent.withOpacity(0.5),
+                      spreadRadius: 7,
+                      blurRadius: 7,
+                      offset: Offset(3, 3), // changes position of shadow
+                    ),
+                  ],
+                  color: Colors.red.shade700,
+                ),
                 child: Stack(
                   children: [
                     AnimatedDefaultTextStyle(

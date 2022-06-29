@@ -4,9 +4,11 @@ class Mycoin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100,
-      height: 100,
-      child: Image.asset('assets/sky/coin.png'),
+      width: 50,
+      height: 50,
+      child: Image.asset(
+        'assets/sky/coin.png',
+      ),
     );
   }
 }
