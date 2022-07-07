@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'dino.dart';
 import 'gamepage.dart';
 import 'dart:async';
+import 'storage/storage.dart';
 
 class MyMenuPage extends StatefulWidget {
   @override
@@ -15,10 +16,12 @@ class _MyMenuPageState extends State<MyMenuPage> {
   bool running = true;
   double x = -1;
   double y = 1;
+  int score = 0;
   bool animate = true;
   void initState() {
     SystemChrome.setEnabledSystemUIOverlays(
         []); //disable system bars top and bottom
+    updateScore();
     super.initState();
     Timer.periodic(
       Duration(milliseconds: 550),
@@ -29,6 +32,10 @@ class _MyMenuPageState extends State<MyMenuPage> {
         });
       },
     );
+  }
+
+  void updateScore() async {
+    score = await CounterStorage().readCounter();
   }
 
   Widget sky(double x, double y, BuildContext context) {
@@ -42,6 +49,13 @@ class _MyMenuPageState extends State<MyMenuPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 sun(),
+                Container(
+                  child: Text('LAST SCORE  $score',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 32)),
+                ),
                 cloud(),
               ],
             ),

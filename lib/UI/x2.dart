@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class Mycoin extends StatelessWidget {
-  double w = 52;
-  double h = 52;
-  double w2 = 56;
-  double h2 = 56;
+class Myx2 extends StatelessWidget {
+  double w = 90;
+  double h = 90;
+  double w2 = 120;
+  double h2 = 120;
   bool animate = true;
-  Mycoin(bool animate) {
+  Myx2(bool animate) {
     this.animate = animate;
   }
   @override
@@ -15,9 +15,9 @@ class Mycoin extends StatelessWidget {
     return Container(
       width: animate ? w : w2,
       height: animate ? h : h2,
-      child: animate
-          ? Image.asset('assets/sky/coin2.png')
-          : Image.asset('assets/sky/coin1.png'),
+      child: Image.asset(
+        'assets/sky/x2.png',
+      ),
     );
   }
 }

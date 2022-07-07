@@ -7,6 +7,9 @@ import 'package:flutter_2d_game/UI/coin.dart';
 import 'package:flutter_2d_game/UI/jumpingdino.dart';
 import 'dino.dart';
 import 'skyelements.dart';
+import 'x2.dart';
+import 'coin.dart';
+import 'storage/storage.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -16,18 +19,34 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double x = -1;
   double y = 1;
+  bool firstmove = true;
+  double move = 0;
   double cx = 0.8;
+  double cx2 = 1.5;
+  double cx3 = 2.2;
+  double cx4 = 2.7;
   double cy = 1;
+  double cy2 = 0.2;
   double v0 = 0.8;
   double t = 0;
+  int m = 1;
+  bool animate = true;
   bool jumping = false;
   static double g = 9.8;
-  int score = 0;
+  var score = 0;
   String direction = "right";
   bool running = true;
   void initState() {
-    SystemChrome.setEnabledSystemUIOverlays(
-        []); //disable system bars top and bottom
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    //disable system bars top and bottom
+    Timer.periodic(
+      Duration(milliseconds: 550),
+      (timer) {
+        setState(() {
+          animate = !animate;
+        });
+      },
+    );
     super.initState();
   }
 
@@ -62,17 +81,62 @@ class _MyHomePageState extends State<MyHomePage> {
     if ((x - cx).abs() < 0.05 && (y - cy).abs() < 0.05) {
       setState(() {
         //if you catch the coin  add the score e move the coin off the screen
-        score++;
-        cx = cx + 1;
+        cx = cx + 2;
+        score = m + score;
       });
     }
+    if ((x - cx2).abs() < 0.05 && (y - cy).abs() < 0.05) {
+      setState(() {
+        //if you  catch the coin  add the score e move the coin off the screen
+        cx2 = cx2 + 2;
+        score = m + score;
+      });
+    }
+    if ((x - cx3).abs() < 0.05 && (y - cy).abs() < 0.05) {
+      setState(() {
+        //if you catch the coin  add the score e move the coin off the screen
+        cx3 = cx3 + 2;
+        score = m + score;
+      });
+    }
+    if ((x - cx4).abs() < 0.1 && (y - cy2).abs() < 0.1) {
+      setState(() {
+        //if you catch the x2  add the score e move the x2 off the screen
+        score = score + 4;
+        m = 2;
+        cx4 = cx4 + 12;
+      });
+    }
+    if (cx < -1) {
+      cx = cx + 2;
+    }
+    if (cx2 < -1) {
+      cx2 = cx2 + 2;
+    }
+    if (cx3 < -1) {
+      cx3 = cx3 + 2;
+    }
+    if (cx4 < -12) {
+      cx4 += 14;
+    }
+    if (m == 2) {
+      Timer.periodic(Duration(seconds: 15), (timer) {
+        m = 1;
+        timer.cancel();
+      });
+    }
+    CounterStorage().pushCounter(score);
   }
 
   void updaterunning() {
     running = !running;
   }
 
-  void jump(double x0, double y0) {
+  void jump(double x0, double y0, String direction) {
+    double d = 0;
+    if (direction == "left") {
+      d = pi;
+    }
     if (jumping == true) {
       return;
     } else {
@@ -84,8 +148,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
           /// Navigate to seconds screen when timer callback in executed
           setState(() {
-            x = x0 + ((v0 * cos(pi / 3)) * t);
-            y = (-0.5 * g * pow(t, 2)) + (v0 * sin(pi / 3) * t) + y0;
+            // x = x0 + ((v0 * cos(d + pi / 3)) * t);
+            if (direction == "right") {
+              move = -0.2;
+            } else {
+              move = 0.2;
+            }
+            y = (-0.5 * g * pow(t, 2)) + (v0 * sin(d + pi / 3) * t) + y0;
           });
           if (y0 - y > 1) {
             updatey(1);
@@ -97,6 +166,13 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       );
     }
+  }
+
+  void coinmovement() {
+    cx = cx + move;
+    cx2 = cx2 + move;
+    cx3 = cx3 + move;
+    cx4 = cx4 + move;
   }
 
   Widget buttonForward() {
@@ -114,10 +190,24 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
         ),
         onPressed: () {
-          x += 0.2;
-          updatex(x);
-          updated("right");
           updaterunning();
+          if (firstmove == true) {
+            updatex(x + 0.05);
+            firstmove = false;
+          }
+          updated("right");
+          setState(() {
+            move = -0.05;
+            //speed up
+            if (score > 3) {
+              move = -0.07;
+            }
+            //second speed up
+            if (score > 10) {
+              move = -0.09;
+            }
+            coinmovement();
+          });
           Timer.periodic(Duration(milliseconds: 100), (timer) {
             addscore();
           });
@@ -141,7 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
         ),
         onPressed: () {
-          jump(x, y);
+          jump(x, y, direction);
+          coinmovement();
         },
       ),
     );
@@ -162,15 +253,32 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
         ),
         onPressed: () {
-          x -= 0.2;
-          updatex(x);
-          updated("left");
           updaterunning();
+          //updatex(x - 0.05);
+          updated("left");
+          setState(() {
+            move = 0.08;
+            coinmovement();
+          });
           Timer.periodic(Duration(milliseconds: 100), (timer) {
             addscore();
           });
         },
       ),
+    );
+  }
+
+  Widget coin(double cx, double cy) {
+    return Container(
+      alignment: Alignment(cx, cy),
+      child: Mycoin(animate),
+    );
+  }
+
+  Widget x2(double cx, double cy) {
+    return Container(
+      alignment: Alignment(cx, cy),
+      child: Myx2(animate),
     );
   }
 
@@ -229,14 +337,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: AnimatedContainer(
                     duration: Duration(microseconds: 0),
                     alignment: Alignment(x, y),
-                    child:
-                        jumping ? Myjumpingdino() : Mydino(direction, running),
+                    child: jumping
+                        ? Myjumpingdino(direction)
+                        : Mydino(direction, running),
                   ),
                 ),
-                Container(
-                  alignment: Alignment(cx, cy),
-                  child: Mycoin(),
-                ),
+                coin(cx, cy),
+                coin(cx2, cy),
+                coin(cx3, cy),
+                x2(cx4, cy2),
               ],
             ))
           ],
