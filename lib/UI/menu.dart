@@ -13,14 +13,19 @@ class MyMenuPage extends StatefulWidget {
 
 class _MyMenuPageState extends State<MyMenuPage> {
   String direction = "right";
-  bool running = true;
+  int running = 0; //dino in idle pose
   double x = -1;
   double y = 1;
   int score = 0;
   bool animate = true;
   void initState() {
-    SystemChrome.setEnabledSystemUIOverlays(
-        []); //disable system bars top and bottom
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: []); //disable system bars top and bottom
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    //disable rotation of screen
     updateScore();
     super.initState();
     Timer.periodic(
@@ -122,7 +127,7 @@ class _MyMenuPageState extends State<MyMenuPage> {
               child: AnimatedContainer(
                 duration: Duration(microseconds: 0),
                 alignment: Alignment(x, y),
-                child: Mydino(direction, running),
+                child: Mydino(running),
               ),
             ),
           ],
@@ -132,11 +137,9 @@ class _MyMenuPageState extends State<MyMenuPage> {
   }
 
   Widget green() {
-    return Expanded(
-      flex: 1,
-      child: Container(
-        color: Colors.green,
-      ),
+    return Container(
+      color: Colors.green,
+      height: 10,
     );
   }
 

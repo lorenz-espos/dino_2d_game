@@ -42,6 +42,7 @@ flutter:
   assets:
     - assets/dino/
     - assets/sky/
+    - assets/enemy/
 
 
   # The following line ensures that the Material Icons font is

@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_2d_game/UI/bullet.dart';
 import 'package:flutter_2d_game/UI/coin.dart';
 import 'package:flutter_2d_game/UI/jumpingdino.dart';
 import 'dino.dart';
@@ -10,6 +11,7 @@ import 'skyelements.dart';
 import 'x2.dart';
 import 'coin.dart';
 import 'storage/storage.dart';
+import 'gameover.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -22,41 +24,54 @@ class _MyHomePageState extends State<MyHomePage> {
   bool firstmove = true;
   double move = 0;
   double cx = 0.8;
+  bool moltiply = false;
   double cx2 = 1.5;
   double cx3 = 2.2;
-  double cx4 = 2.7;
+  double cx4 = 4.7;
   double cy = 1;
-  double cy2 = 0.2;
-  double v0 = 0.8;
+  double cy2 = -0.6;
+  double bx = 1;
+  double by = 1;
+  double v0 = 0.2;
+  bool start = false;
   double t = 0;
   int m = 1;
   bool animate = true;
   bool jumping = false;
-  static double g = 9.8;
+  int jumpv = 1;
   var score = 0;
-  String direction = "right";
-  bool running = true;
+  int running = 0;
+  int bulleta = 0;
+  int distance = 0;
+  double bmove = -0.015;
+  Random random = new Random();
+
   void initState() {
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    start = true;
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     //disable system bars top and bottom
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    //disable rotation of screen
     Timer.periodic(
       Duration(milliseconds: 550),
       (timer) {
         setState(() {
           animate = !animate;
+          bulleta++;
+          if (bulleta == 4) {
+            bulleta = 0;
+          }
         });
       },
     );
-    super.initState();
-  }
-
-  void updated(String direction) {
-    if (x == -1) {
-      direction = "right";
-    }
-    setState(() {
-      this.direction = direction;
+    Timer.periodic(Duration(milliseconds: 60), (timer) {
+      run();
     });
+
+    super.initState();
   }
 
   void updatex(double x) {
@@ -104,7 +119,8 @@ class _MyHomePageState extends State<MyHomePage> {
         //if you catch the x2  add the score e move the x2 off the screen
         score = score + 4;
         m = 2;
-        cx4 = cx4 + 12;
+        moltiply = true;
+        cx4 = cx4 + 32;
       });
     }
     if (cx < -1) {
@@ -117,26 +133,61 @@ class _MyHomePageState extends State<MyHomePage> {
       cx3 = cx3 + 2;
     }
     if (cx4 < -12) {
-      cx4 += 14;
+      cx4 += 34;
     }
     if (m == 2) {
       Timer.periodic(Duration(seconds: 15), (timer) {
         m = 1;
+        moltiply = false;
         timer.cancel();
       });
     }
     CounterStorage().pushCounter(score);
   }
 
-  void updaterunning() {
-    running = !running;
+  void death() {
+    if ((x - bx).abs() < 0.05 && (y - by).abs() < 0.05) {
+      setState(() {
+        start = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Gameover()),
+      );
+    }
+    if (bx < -1) {
+      bx = bx + random.nextInt(18) + 2;
+    }
   }
 
-  void jump(double x0, double y0, String direction) {
-    double d = 0;
-    if (direction == "left") {
-      d = pi;
+  void updaterunning() {
+    running++;
+    if (running == 9) {
+      running = 1;
     }
+  }
+
+  void updatejump() {
+    jumpv++;
+    if (jumpv == 13) {
+      jumpv = 1;
+    }
+  }
+
+  void prejump() {
+    start = false;
+    t = 0;
+    sleep(Duration(milliseconds: 10));
+    //introducing delay in the jump
+  }
+
+  void postjump() {
+    start = true;
+    sleep(Duration(milliseconds: 10));
+    //introducing delay in the jump
+  }
+
+  void jump(double x0, double y0) {
     if (jumping == true) {
       return;
     } else {
@@ -144,22 +195,17 @@ class _MyHomePageState extends State<MyHomePage> {
       Timer.periodic(
         Duration(milliseconds: 50),
         (timer) {
-          t += 0.08;
+          t += 0.05;
+          updatejump();
 
           /// Navigate to seconds screen when timer callback in executed
           setState(() {
-            // x = x0 + ((v0 * cos(d + pi / 3)) * t);
-            if (direction == "right") {
-              move = -0.2;
-            } else {
-              move = 0.2;
-            }
-            y = (-0.5 * g * pow(t, 2)) + (v0 * sin(d + pi / 3) * t) + y0;
+            y = y0 - ((-4.6 * pow(t, 2)) + (6.2 * t));
           });
-          if (y0 - y > 1) {
+          if (y > 1) {
             updatey(1);
-            timer.cancel();
             t = 0;
+            timer.cancel();
             jumping = false;
           }
           addscore();
@@ -172,9 +218,42 @@ class _MyHomePageState extends State<MyHomePage> {
     cx = cx + move;
     cx2 = cx2 + move;
     cx3 = cx3 + move;
-    cx4 = cx4 + move;
+    cx4 = cx4 + move; //x2 movement
+    bx = bx + move + bmove; //bullet movement
   }
 
+  void run() {
+    if (start == true) {
+      updaterunning();
+      if (firstmove == true) {
+        updatex(x + 0.05);
+        firstmove = false;
+        sleep(Duration(milliseconds: 100));
+      }
+      setState(() {
+        if (distance < 300) {
+          move = -0.02;
+        }
+        if (distance > 600 && distance < 1000) {
+          move = -0.05;
+          bmove = -0.03;
+        }
+        if (distance > 1000) {
+          move = -0.07;
+        }
+
+        coinmovement();
+        distance++;
+      });
+      Timer.periodic(Duration(milliseconds: 30), (timer) {
+        addscore();
+        death();
+        timer.cancel();
+      });
+    }
+  }
+
+/*
   Widget buttonForward() {
     return Container(
       decoration: BoxDecoration(
@@ -231,12 +310,15 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
         ),
         onPressed: () {
-          jump(x, y, direction);
+          prejump();
+          jump(x, y);
           coinmovement();
+          postjump();
         },
       ),
     );
   }
+
 
   Widget buttonBackward() {
     return Container(
@@ -267,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
+*/
   Widget coin(double cx, double cy) {
     return Container(
       alignment: Alignment(cx, cy),
@@ -282,30 +364,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget ground() {
-    return Expanded(
-      flex: 3,
-      child: Container(
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            buttonBackward(),
-            buttonUpward(),
-            buttonForward(),
-          ],
-        ),
-        color: Colors.brown,
-      ),
+  Widget bullet(double bx, double by) {
+    return Container(
+      alignment: Alignment(bx, by),
+      child: Mybullet(bulleta),
     );
   }
 
-  Widget green() {
+  Widget ground() {
     return Expanded(
-      flex: 1,
-      child: Container(
-        color: Colors.green,
-      ),
+        flex: 3,
+        child: GestureDetector(
+          onTap: () {
+            prejump();
+            jump(x, y);
+            coinmovement();
+            postjump();
+          },
+          child: Container(
+            /* child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // buttonBackward(),
+                buttonUpward(),
+                // buttonForward(),
+              ],
+            ),
+            */
+            color: Colors.brown,
+          ),
+        ));
+  }
+
+  Widget green() {
+    return Container(
+      color: Colors.green,
+      height: 10,
     );
   }
 
@@ -321,11 +416,35 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 sun(),
                 Container(
-                  child: Text('SCORE  $score',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 32)),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(right: 2),
+                            child: Text('SCORE  $score ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 20)),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 2),
+                            child: Text(' DISTANCE  $distance',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 20)),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        child: moltiply ? Myx2(true) : null,
+                      ),
+                    ],
+                  ),
                 ),
                 cloud(),
               ],
@@ -337,15 +456,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: AnimatedContainer(
                     duration: Duration(microseconds: 0),
                     alignment: Alignment(x, y),
-                    child: jumping
-                        ? Myjumpingdino(direction)
-                        : Mydino(direction, running),
+                    child: jumping ? Myjumpingdino(jumpv) : Mydino(running),
                   ),
                 ),
                 coin(cx, cy),
                 coin(cx2, cy),
                 coin(cx3, cy),
                 x2(cx4, cy2),
+                bullet(bx, by),
               ],
             ))
           ],
