@@ -452,7 +452,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
                 child: Stack(
               children: [
-                Expanded(
+                Container(
                   child: AnimatedContainer(
                     duration: Duration(microseconds: 0),
                     alignment: Alignment(x, y),
