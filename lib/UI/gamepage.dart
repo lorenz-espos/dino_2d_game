@@ -12,6 +12,7 @@ import 'x2.dart';
 import 'coin.dart';
 import 'storage/storage.dart';
 import 'gameover.dart';
+import 'meteor.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -19,19 +20,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //variables
   double x = -1;
   double y = 1;
   bool firstmove = true;
-  double move = 0;
+  double move = -1;
   double cx = 0.8;
   bool moltiply = false;
   double cx2 = 1.5;
   double cx3 = 2.2;
   double cx4 = 4.7;
   double cy = 1;
-  double cy2 = -0.6;
+  double cy2 = -0.3;
   double bx = 1;
   double by = 1;
+  double bx2 = 2.5;
+  double bx3 = 3.5;
+  double by3 = -0.57;
   double v0 = 0.2;
   bool start = false;
   double t = 0;
@@ -45,6 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int distance = 0;
   double bmove = -0.015;
   Random random = new Random();
+  bool bullet2 = false;
+  int meteora = 0;
 
   void initState() {
     start = true;
@@ -64,11 +71,16 @@ class _MyHomePageState extends State<MyHomePage> {
           if (bulleta == 4) {
             bulleta = 0;
           }
+          meteora++;
+          if (meteora == 2) {
+            meteora = 0;
+          }
         });
       },
     );
     Timer.periodic(Duration(milliseconds: 60), (timer) {
       run();
+      //function of running dino
     });
 
     super.initState();
@@ -158,6 +170,30 @@ class _MyHomePageState extends State<MyHomePage> {
     if (bx < -1) {
       bx = bx + random.nextInt(18) + 2;
     }
+    if ((x - bx2).abs() < 0.05 && (y - by).abs() < 0.05 && bullet2 == true) {
+      setState(() {
+        start = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Gameover()),
+      );
+    }
+    if (bx2 < -1) {
+      bx2 = bx2 + random.nextInt(22) + 4;
+    }
+    if ((x - bx3).abs() < 0.25 && (y - by3).abs() < 0.35) {
+      setState(() {
+        start = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Gameover()),
+      );
+    }
+    if (bx3 < -1) {
+      bx3 = bx3 + random.nextInt(19) + 1;
+    }
   }
 
   void updaterunning() {
@@ -193,18 +229,19 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       jumping = true;
       Timer.periodic(
-        Duration(milliseconds: 50),
+        Duration(milliseconds: 42),
         (timer) {
-          t += 0.05;
+          // t += 0.05;
+          t += 0.08;
           updatejump();
 
           /// Navigate to seconds screen when timer callback in executed
           setState(() {
-            y = y0 - ((-4.6 * pow(t, 2)) + (6.2 * t));
+            y = y0 - ((-4.6 * pow(t, 2)) + (6.55 * t));
           });
           if (y > 1) {
-            updatey(1);
             t = 0;
+            updatey(1);
             timer.cancel();
             jumping = false;
           }
@@ -220,6 +257,15 @@ class _MyHomePageState extends State<MyHomePage> {
     cx3 = cx3 + move;
     cx4 = cx4 + move; //x2 movement
     bx = bx + move + bmove; //bullet movement
+    bx2 = bx2 + move + bmove; //bullet movement
+    bx3 = bx3 + move + bmove - 0.02; //meteor movement
+    //debug();
+  }
+
+//prints for debug
+  void debug() {
+    // print('x= $x');
+    print('y= $y');
   }
 
   void run() {
@@ -231,21 +277,22 @@ class _MyHomePageState extends State<MyHomePage> {
         sleep(Duration(milliseconds: 100));
       }
       setState(() {
-        if (distance < 300) {
-          move = -0.02;
+        if (distance < 400) {
+          move = -0.025;
         }
-        if (distance > 600 && distance < 1000) {
+        if (distance > 400 && distance < 1000) {
           move = -0.05;
           bmove = -0.03;
         }
         if (distance > 1000) {
-          move = -0.07;
+          move = -0.06;
+          bullet2 = true;
         }
 
         coinmovement();
         distance++;
       });
-      Timer.periodic(Duration(milliseconds: 30), (timer) {
+      Timer.periodic(Duration(milliseconds: 28), (timer) {
         addscore();
         death();
         timer.cancel();
@@ -371,18 +418,18 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget meteor(double mx, double my) {
+    return Container(
+      alignment: Alignment(mx, my),
+      child: Mymeteor(meteora),
+    );
+  }
+
   Widget ground() {
     return Expanded(
         flex: 3,
-        child: GestureDetector(
-          onTap: () {
-            prejump();
-            jump(x, y);
-            coinmovement();
-            postjump();
-          },
-          child: Container(
-            /* child: Row(
+        child: Container(
+          /* child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -392,8 +439,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             */
-            color: Colors.brown,
-          ),
+          color: Colors.brown,
         ));
   }
 
@@ -464,6 +510,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 coin(cx3, cy),
                 x2(cx4, cy2),
                 bullet(bx, by),
+                bullet2 ? bullet(bx2, by) : Container(),
+                meteor(bx3, by3),
               ],
             ))
           ],
@@ -475,13 +523,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+        body: GestureDetector(
+      onTap: () {
+        prejump();
+        jump(x, y);
+        coinmovement();
+        postjump();
+      },
+      child: Column(
         children: [
           sky(x, y),
           green(),
           ground(),
         ],
       ),
-    );
+    ));
   }
 }
