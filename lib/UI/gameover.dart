@@ -26,7 +26,7 @@ class _GameoverState extends State<Gameover> {
   }
 
   void death() {
-    Timer.periodic(Duration(milliseconds: 80), (timer) {
+    Timer.periodic(Duration(milliseconds: 85), (timer) {
       setState(() {
         if (animate < 7) {
           animate++;
@@ -37,16 +37,16 @@ class _GameoverState extends State<Gameover> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      body: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MyMenuPage()),
-            );
-          },
-          child: Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyMenuPage()),
+        );
+      },
+      child: Scaffold(
+          backgroundColor: Colors.blue,
+          body: Container(
               padding: EdgeInsets.all(20),
               alignment: Alignment(0, 0),
               child: Column(

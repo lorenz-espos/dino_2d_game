@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
     if (bx3 < -1) {
-      bx3 = bx3 + random.nextInt(19) + 1;
+      bx3 = bx3 + random.nextInt(19) + 2;
     }
   }
 
@@ -268,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print('y= $y');
   }
 
-  void run() {
+  Future<void> run() async {
     if (start == true) {
       updaterunning();
       if (firstmove == true) {

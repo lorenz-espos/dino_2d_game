@@ -154,6 +154,27 @@ class _MyMenuPageState extends State<MyMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(Image.asset('assets/dino/Run (1).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (2).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (3).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (4).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (5).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (6).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (7).png').image, context);
+    precacheImage(Image.asset('assets/dino/Run (8).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (1).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (2).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (3).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (4).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (5).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (6).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (7).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (8).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (9).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (10).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (11).png').image, context);
+    precacheImage(Image.asset('assets/dino/Jump (12).png').image, context);
+
     return Scaffold(
       body: Column(
         children: [
