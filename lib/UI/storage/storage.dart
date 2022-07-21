@@ -4,6 +4,10 @@ import 'package:path_provider/path_provider.dart';
 
 class CounterStorage {
   int score = 0;
+  int selector = 0;
+  CounterStorage(int selector) {
+    this.selector = selector;
+  }
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -12,7 +16,19 @@ class CounterStorage {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/storage.txt');
+    if (selector == 1) {
+      //storage of last score
+      return File('$path/storage.txt');
+    }
+    if (selector == 2) {
+      //storage of last distance
+      return File('$path/storage1.txt');
+    }
+    if (selector == 3) {
+      //storage of coins
+      return File('$path/storage2.txt');
+    }
+    return File('');
   }
 
   Future<int> readCounter() async {

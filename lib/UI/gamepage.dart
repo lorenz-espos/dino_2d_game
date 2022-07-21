@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double cy2 = -0.3;
   double bx = 1;
   double by = 1;
-  double bx2 = 2.5;
+  double bx2 = 3.8;
   double bx3 = 3.5;
   double by3 = -0.57;
   double v0 = 0.2;
@@ -154,7 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
         timer.cancel();
       });
     }
-    CounterStorage().pushCounter(score);
+    CounterStorage(1).pushCounter(score);
+    CounterStorage(2).pushCounter(distance);
   }
 
   void death() {
@@ -192,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
     if (bx3 < -1) {
-      bx3 = bx3 + random.nextInt(19) + 2;
+      bx3 = bx3 + random.nextInt(25) + 5;
     }
   }
 
@@ -229,7 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       jumping = true;
       Timer.periodic(
-        Duration(milliseconds: 42),
+        Duration(milliseconds: 40),
         (timer) {
           // t += 0.05;
           t += 0.08;
@@ -258,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
     cx4 = cx4 + move; //x2 movement
     bx = bx + move + bmove; //bullet movement
     bx2 = bx2 + move + bmove; //bullet movement
-    bx3 = bx3 + move + bmove - 0.02; //meteor movement
+    bx3 = bx3 + move + bmove - 0.025; //meteor movement
     //debug();
   }
 
@@ -429,7 +430,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return Expanded(
         flex: 3,
         child: Container(
-          /* child: Row(
+          /* 
+          //button row
+          child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

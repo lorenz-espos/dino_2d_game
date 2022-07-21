@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'skyelements.dart';
 import 'package:flutter/services.dart';
-import 'dino.dart';
 import 'gamepage.dart';
 import 'dart:async';
 import 'storage/storage.dart';
+import 'dino.dart';
 
 class MyMenuPage extends StatefulWidget {
   @override
@@ -12,11 +12,11 @@ class MyMenuPage extends StatefulWidget {
 }
 
 class _MyMenuPageState extends State<MyMenuPage> {
-  String direction = "right";
   int running = 0; //dino in idle pose
   double x = -1;
   double y = 1;
   int score = 0;
+  int distance = 0;
   bool animate = true;
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
@@ -40,7 +40,8 @@ class _MyMenuPageState extends State<MyMenuPage> {
   }
 
   void updateScore() async {
-    score = await CounterStorage().readCounter();
+    score = await CounterStorage(1).readCounter();
+    distance = await CounterStorage(2).readCounter();
   }
 
   Widget sky(double x, double y, BuildContext context) {
@@ -55,11 +56,20 @@ class _MyMenuPageState extends State<MyMenuPage> {
               children: [
                 sun(),
                 Container(
-                  child: Text('LAST SCORE  $score',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 32)),
+                  child: Column(
+                    children: [
+                      Text('LAST SCORE  $score',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 32)),
+                      Text('LAST DISTANCE  $distance',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 32)),
+                    ],
+                  ),
                 ),
                 cloud(),
               ],
@@ -154,6 +164,7 @@ class _MyMenuPageState extends State<MyMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    //preload of image (fix the glitch)
     precacheImage(Image.asset('assets/dino/Run (1).png').image, context);
     precacheImage(Image.asset('assets/dino/Run (2).png').image, context);
     precacheImage(Image.asset('assets/dino/Run (3).png').image, context);
