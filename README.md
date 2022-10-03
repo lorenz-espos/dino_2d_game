@@ -1,7 +1,10 @@
 # dino_2d_game
 
 
-https://user-images.githubusercontent.com/72261684/175817977-d4235b98-cab4-4761-9fd4-a83c70f8bab6.mov
+
+https://user-images.githubusercontent.com/72261684/193640749-d50540e6-215c-4c83-865b-7daa2a358bcc.mov
+
+
 
 
 
