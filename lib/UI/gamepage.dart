@@ -9,7 +9,6 @@ import 'package:flutter_2d_game/UI/jumpingdino.dart';
 import 'dino.dart';
 import 'skyelements.dart';
 import 'x2.dart';
-import 'coin.dart';
 import 'storage/storage.dart';
 import 'gameover.dart';
 import 'meteor.dart';
@@ -51,6 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double bmove = -0.015;
   Random random = new Random();
   bool bullet2 = false;
+  bool bullet3 = false;
+
   int meteora = 0;
 
   void initState() {
@@ -168,8 +169,10 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => Gameover()),
       );
     }
-    if (bx < -1) {
-      bx = bx + random.nextInt(18) + 2;
+    if (bx < -1 || bx==bx2||bx==bx3) {
+     // bx = bx + random.nextInt(18) ;
+      bx = bx + 4 ;
+
     }
     if ((x - bx2).abs() < 0.05 && (y - by).abs() < 0.05 && bullet2 == true) {
       setState(() {
@@ -180,10 +183,12 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => Gameover()),
       );
     }
-    if (bx2 < -1) {
-      bx2 = bx2 + random.nextInt(22) + 4;
+    if (bx2 < -1 || bx2==bx||bx2==bx3) {
+      //bx2 = bx2 + random.nextInt(22);
+        bx2 = bx2 + 8;
+
     }
-    if ((x - bx3).abs() < 0.25 && (y - by3).abs() < 0.35) {
+    if ((x - bx3).abs() < 0.25 && (y - by3).abs() < 0.35&& bullet3 == true) {
       setState(() {
         start = false;
       });
@@ -192,8 +197,10 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(builder: (context) => Gameover()),
       );
     }
-    if (bx3 < -1) {
-      bx3 = bx3 + random.nextInt(25) + 5;
+    if (bx3 < -1 || bx3==bx||bx3==bx2) {
+      //bx3 = bx3 + random.nextInt(25)+4 ;
+        bx3 = bx3 + 4 ;
+
     }
   }
 
@@ -278,11 +285,14 @@ class _MyHomePageState extends State<MyHomePage> {
         sleep(Duration(milliseconds: 100));
       }
       setState(() {
-        if (distance < 400) {
-          move = -0.025;
+        if (distance < 200) {
+          move = -0.030;
         }
-        if (distance > 400 && distance < 1000) {
-          move = -0.05;
+        if (distance > 200 && distance < 1000) {
+          if(move>-0.055){
+            move = move - 0.005;
+
+          }
           bmove = -0.03;
         }
         if (distance > 1000) {
@@ -301,103 +311,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-/*
-  Widget buttonForward() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.brown.shade200,
-      ),
-      padding: EdgeInsets.all(5),
-      child: IconButton(
-        tooltip: 'Run Forward',
-        icon: Icon(
-          Icons.arrow_forward,
-          size: 35,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          updaterunning();
-          if (firstmove == true) {
-            updatex(x + 0.05);
-            firstmove = false;
-          }
-          updated("right");
-          setState(() {
-            move = -0.05;
-            //speed up
-            if (score > 3) {
-              move = -0.07;
-            }
-            //second speed up
-            if (score > 10) {
-              move = -0.09;
-            }
-            coinmovement();
-          });
-          Timer.periodic(Duration(milliseconds: 100), (timer) {
-            addscore();
-          });
-        },
-      ),
-    );
-  }
-
-  Widget buttonUpward() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.brown.shade200,
-      ),
-      padding: EdgeInsets.all(5),
-      child: IconButton(
-        tooltip: 'Jump',
-        icon: Icon(
-          Icons.arrow_upward,
-          size: 35,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          prejump();
-          jump(x, y);
-          coinmovement();
-          postjump();
-        },
-      ),
-    );
-  }
-
-
-  Widget buttonBackward() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.brown.shade200,
-      ),
-      padding: EdgeInsets.all(5),
-      child: IconButton(
-        tooltip: 'Run back',
-        icon: Icon(
-          Icons.arrow_back,
-          size: 35,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          updaterunning();
-          //updatex(x - 0.05);
-          updated("left");
-          setState(() {
-            move = 0.08;
-            coinmovement();
-          });
-          Timer.periodic(Duration(milliseconds: 100), (timer) {
-            addscore();
-          });
-        },
-      ),
-    );
-  }
-*/
   Widget coin(double cx, double cy) {
     return Container(
       alignment: Alignment(cx, cy),
@@ -430,18 +343,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Expanded(
         flex: 3,
         child: Container(
-          /* 
-          //button row
-          child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // buttonBackward(),
-                buttonUpward(),
-                // buttonForward(),
-              ],
-            ),
-            */
           color: Colors.brown,
         ));
   }
@@ -514,7 +415,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 x2(cx4, cy2),
                 bullet(bx, by),
                 bullet2 ? bullet(bx2, by) : Container(),
-                meteor(bx3, by3),
+                bullet3 ? meteor(bx3, by3) : Container(),
+
               ],
             ))
           ],
