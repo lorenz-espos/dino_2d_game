@@ -2,7 +2,10 @@
 
 
 
-https://user-images.githubusercontent.com/72261684/193640749-d50540e6-215c-4c83-865b-7daa2a358bcc.mov
+
+
+
+https://github.com/lorenz-espos/dino_2d_game/assets/72261684/b1433a88-2037-4e24-9b0e-3e67da9c2e66
 
 
 
